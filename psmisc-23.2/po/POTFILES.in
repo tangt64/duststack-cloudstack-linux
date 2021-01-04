@@ -1,9 +1,0 @@
-src/fuser.c
-src/killall.c
-src/peekfd.c
-src/prtstat.c
-src/pslog.c
-src/pstree.c
-src/signals.c
-src/signames.c
-src/timeout.c

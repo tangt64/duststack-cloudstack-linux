@@ -1,9 +1,0 @@
-#!/bin/bash
-# gen_mt_tokens (07/21/2002 rss)
-
-MT=/usr/atria/bin/multitool
-mt_token_list=$(echo 'help' | $MT | grep 'Usage:' | awk '{ print $2 }' | sort)
-echo $mt_token_list >mt_tokens
-
-#
-# gen_mt_tokens ends here

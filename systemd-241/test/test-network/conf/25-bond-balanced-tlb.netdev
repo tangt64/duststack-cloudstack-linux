@@ -1,7 +1,0 @@
-[NetDev]
-Name=bond99
-Kind=bond
-
-[Bond]
-Mode=balance-tlb
-DynamicTransmitLoadBalancing=true
