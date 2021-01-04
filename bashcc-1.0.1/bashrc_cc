@@ -1,0 +1,190 @@
+# bashrc_cc
+# Bash functions for ClearCase users
+# (Richard Smith 07/21/2002)
+
+#
+# First we make sure the Bash version is current enough to support what
+# we are doing here.  Bash version 2.05 or greater is required.
+#
+
+version="${BASH_VERSINFO[0]}.${BASH_VERSINFO[1]}"
+
+if [[ $version < "2.05" ]]; then
+  echo "ERROR: Unable to load ClearCase auto-completion functions"
+  echo "Current Bash version is $version, need 2.05 or greater"
+  return
+fi
+
+#
+# User-defined variables
+#
+
+ADMIN_VOB=/vob/admin
+
+#
+# Declare and import variables
+#
+
+BASH_DIR=~/.bash
+
+CT_TOK_FILE=$BASH_DIR/ct_tokens
+
+if [[ -f $CT_TOK_FILE ]]; then
+  CT_TOK_LIST=$(<$CT_TOK_FILE)
+fi
+
+CT_OPTVARS_FILE=$BASH_DIR/ct_optvars
+
+if [[ -f $CT_OPTVARS_FILE ]]; then
+  . $CT_OPTVARS_FILE
+fi
+
+MT_TOK_FILE=$BASH_DIR/mt_tokens
+
+if [[ -f $MT_TOK_FILE ]]; then
+  MT_TOK_LIST=$(<$MT_TOK_FILE)
+fi
+
+MT_OPTVARS_FILE=$BASH_DIR/mt_optvars
+
+if [[ -f $MT_OPTVARS_FILE ]]; then
+  . $MT_OPTVARS_FILE
+fi
+
+#
+# Declare functions
+#
+
+_do_cleartool ()
+{
+  local CMD="/usr/atria/bin/cleartool $* 2>/dev/null"
+  eval $CMD
+}
+
+_substr ()
+{
+  [[ $# = 2 && $1 == *$2* ]]
+}
+
+_begins ()
+{
+  [[ $# = 2 && $1 == $2* ]]
+}
+
+#
+# Completion function for Cleartool
+#
+
+_complete_ct ()
+{
+  shopt -u hostcomplete
+  local TOK=${COMP_WORDS[COMP_CWORD]}
+
+  if [[ $COMP_CWORD == 1 ]]; then
+    COMPREPLY=( $(compgen -W "$CT_TOK_LIST" -- $TOK) )
+
+  elif (_begins $TOK '-'); then
+    local OPTVAR=ctopt_${COMP_WORDS[1]}
+    COMPREPLY=( $(compgen -W "${!OPTVAR}" -- $TOK) )
+
+  elif [[ $COMP_CWORD == 2 && ${COMP_WORDS[1]} = "man" || ${COMP_WORDS[1]} = "help" ]]; then
+    COMPREPLY=( $(compgen -W "$CT_TOK_LIST" -- $TOK) )
+
+  elif (_substr ${COMP_WORDS[1]} 'view'); then
+    local VIEWS=$(_do_cleartool lsview -short)
+    COMPREPLY=( $(compgen -W "$VIEWS" -- $TOK) )
+
+  elif (_substr $TOK ':'); then
+    local metatype=${TOK%%:*}
+    local typename=${TOK##*:}
+    local TYPELIST=$(_do_cleartool lstype -kind $metatype -short -invob $ADMIN_VOB)
+    COMPREPLY=( $(compgen -W "$TYPELIST" -- $typename) )
+
+  elif (_substr $TOK '@@'); then
+    local element=${TOK%%@*}
+    local VTREE=$(_do_cleartool lsvtree $element)
+    COMPREPLY=( $(compgen -W "$VTREE" -- $TOK) )
+
+  fi
+}
+
+#
+# Completion function for Multitool
+#
+
+_complete_mt ()
+{
+  local TOK=${COMP_WORDS[COMP_CWORD]}
+
+  if [[ $COMP_CWORD == 1 ]]; then
+    COMPREPLY=( $(compgen -W "$MT_TOK_LIST" -- $TOK) )
+
+  elif (_begins $TOK '-'); then
+    local OPTVAR=mtopt_${COMP_WORDS[1]}
+    COMPREPLY=( $(compgen -W "${!OPTVAR}" -- $TOK) )
+
+  elif [[ $COMP_CWORD == 2 && ${COMP_WORDS[1]} = "man" || ${COMP_WORDS[1]} = "help" ]]; then
+    COMPREPLY=( $(compgen -W "$MT_TOK_LIST" -- $TOK) )
+
+  fi
+}
+
+#
+# Filename completetion that groks version-extented pathnames.
+#
+
+_complete_ve_path ()
+{
+  shopt -u hostcomplete
+  local TOK=${COMP_WORDS[COMP_CWORD]}
+  local element
+
+  if (_substr $TOK '@@'); then
+    element=${TOK%%@*}
+  else
+    FILES=( $(compgen -f -- $TOK) )
+    if [[ ${#FILES[*]} == 1 ]]; then
+      element=${FILES[0]}
+    else
+      return
+    fi
+  fi
+
+  local VTREE=$(_do_cleartool lsvtree $element)
+  COMPREPLY=( $(compgen -W "$VTREE" -- $TOK) )
+}
+
+#
+# Define ct and mt and bind them to the functions
+#
+
+alias ct='cleartool'
+
+if [[ -f $CT_TOK_FILE && -f $CT_OPTVARS_FILE ]]; then
+  complete -F _complete_ct -o default ct
+fi
+
+alias mt='multitool'
+
+if [[ -f $MT_TOK_FILE && -f $MT_OPTVARS_FILE ]]; then
+  complete -F _complete_mt -o default mt
+fi
+
+#
+# Special "v" aliases for version-extended paths
+#
+
+alias vcat='cat'
+complete -F _complete_ve_path -o default vcat
+
+alias vmore='more'
+complete -F _complete_ve_path -o default vmore
+
+alias vdiff='diff'
+complete -F _complete_ve_path -o default vdiff
+
+alias vcd='cd'
+complete -F _complete_ve_path -o default vcd
+
+#
+# bashrc_cc ends here

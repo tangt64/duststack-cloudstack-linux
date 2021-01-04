@@ -1,0 +1,36 @@
+# bashrc.sample
+# Additional bashrc functions
+# (Richard Smith 07/21/2002)
+
+#
+# Load the ClearCase Auto-Completion package
+#
+
+CC_RC=~/.bash/bashrc_cc
+if [[ -f $CC_RC ]]; then
+  . $CC_RC
+fi
+
+#
+# Set your shell prompt the "one true way"
+#
+
+if [[ -n $CLEARCASE_ROOT ]]; then
+  CC_VIEW="<${CLEARCASE_ROOT##*/}>"
+fi
+
+PS1='(\h)$CC_VIEW\w\$ '
+
+#
+# Set some useful aliases for common ClearCase operations
+#
+
+alias ci='cleartool ci -nc'
+alias co='cleartool co -nc'
+alias unco='cleartool unco -rm'
+alias mklm='cleartool mkelem -ci -nc'
+alias lsco='cleartool lsco -short -avobs -cview'
+alias lsp='cleartool lsp -short -other -invob .'
+
+#
+# bashrc.sample ends here
