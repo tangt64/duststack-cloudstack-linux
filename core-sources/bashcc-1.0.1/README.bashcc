@@ -1,0 +1,124 @@
+---------------------------------------------------------------------------
+File: README.bashcc
+Author: Richard Smith (rss@idiom.com)
+Version: 1.0.1
+Date: July 22, 2002
+---------------------------------------------------------------------------
+This is the README file for the "bashcc" package.  This package is
+designed to be useful to Bash shell users who also use the ClearCase
+version control system.  ClearCase has a fairly elaborate command-line
+interface, and this interface is particularly amenable to the
+programmable completion features that have been implemented in recent
+versions of the Bash shell.
+
+This README assumes you have a basic familiarity with ClearCase and
+how it works from the Unix command-line.  A basic understanding of how
+Unix shells work in general and Bash in particular is also assumed.
+---------------------------------------------------------------------------
+INSTALLATION:
+
+- You MUST be on a Unix system where ClearCase has been installed into
+  /usr/atria/bin.
+
+- You MUST be running Bash version 2.05 or later.  If you are using
+  2.05a it is strongly recommended that you upgrade to 2.05b, due to
+  some known issues with the malloc implementation in 2.05a.
+
+- You MUST have Perl available on your system, preferably in /usr/bin.
+  The "gen_optvars" script will complain if you don't.
+
+- Create a .bash directory underneath your home directory and copy all
+  the files in this package into that directory (or simply rename this
+  directory).
+
+- From your .bash directory, run "./setup".  This script generates a
+  list of valid "cleartool" commands and their options and writes that
+  list out to a set of files that are parsed every time you start Bash.
+
+- You will also be asked if you want to include MultiSite support.  If
+  you answer "Y" the script will repeat the process for "multitool".
+
+- Lastly, you must arrange for the files in the .bash directory to be
+  included when you start bash.  The usual way to do this is to include
+  something like this in your .bashrc file:
+
+  . ~/.bash/bashrc_cc
+
+- The file "bashrc.sample" has a few more code samples that you may
+  find useful in your .bashrc or .bash_profile.
+
+---------------------------------------------------------------------------
+USAGE:
+
+Most ClearCase users create a "ct" alias so they don't have to type
+"cleartool" all the time.  This package extends the ct alias and makes
+it "smart" in the following ways:
+
+- Cleartool commands.  The first "token" after you type "ct" is always
+  a cleartool command.  There are 144 of these (as of ClearCase 4.2)
+  and this package allows for intelligent completion of them.  In
+  addition, if you type "ct help" or "ct man" it will perform
+  cleartool command completion on the next token.
+
+- Command options.  Each command has a series of options.  If you have
+  already entered a valid command token, and the next token begins
+  with a dash, the package will let you do completion on that token
+  based on a list of the available options for that command.
+
+- Views.  If the command is view-oriented (that is, the command token
+  has "view" as a substring), the next token will be completed based
+  upon the output of "ct lsview".  This is probably the one feature I
+  use most often.
+
+- Metadata.  If you type "ct describe brtype:<something>" the shell
+  will be able to complete on the <something>.  You must define the
+  ADMIN_VOB variable in the bashrc_cc file for this to work.
+
+- Version-extended paths.  If you type "ct describe HelloWorld.cpp@@"
+  and attempt completion right after the "@@", Bash will perform
+  completion based on the output of "ct lsvtree" for the element in
+  front of the "@@".
+
+- More version-extended path support.  There are some special commands
+  defined, like "vcat" which will automatically complete files as
+  version-extended paths.  This is useful if you are trying to track
+  down a version that contains a particular code change that's been
+  lost or "stepped on".  Similar aliases exist for "more", "diff", and
+  "cd" (for exploring directory versions).
+
+- MultiTool support.  If you run MultiSite with ClearCase there is an
+  "mt" implementation as well.  It supports command and option
+  completion but not the other stuff.
+
+---------------------------------------------------------------------------
+FOR MORE INFORMATION:
+
+To see if there is a more recent version of this package, please visit
+my web site:
+
+  http://www.rssnet.org
+
+For more information about Bash, please visit:
+
+  http://cnswww.cns.cwru.edu/~chet/bash/bashtop.html
+
+For more information about ClearCase, please visit
+
+  http://www.rational.com/products/clearcase/
+
+---------------------------------------------------------------------------
+VERSION HISTORY:
+
+1.0 (July 21, 2002): Initial Release.  Basic support for ct, mt, and
+the version-extended stuff.
+
+1.0.1 (July 22, 2002): Trivial Update.  Fixed some typos and added
+some information to the README file.
+
+---------------------------------------------------------------------------
+Copyright (C) 2002, Richard S. Smith.
+
+This package may be freely copied, mirrored, modified, etc.  My only
+request is that this README file remain intact and be distributed
+along with any modified version.
+---------------------------------------------------------------------------

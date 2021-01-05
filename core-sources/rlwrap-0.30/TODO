@@ -1,0 +1,22 @@
+TODO:
+
+SHORT-TERM:
+
+- fix the BUGS (cf BUGS)
+
+- Better filename completion (quoting(?), sensible handling of filenames 
+  that contain word-breaking characters)
+
+LONG-TERM:
+
+- rlwrap could use input- and output filters - i.e separate processes that
+  digest user input and possibly interact with rlwrap to update the
+  completion word list - or even to do the completion itself. 
+  This would subsume some functionality now handled by
+  rlwrap (like the -r and -l options)
+
+
+
+
+
+  

@@ -1,0 +1,31 @@
+#!/bin/bash
+# setup (07/21/2002 rss)
+
+umask 022
+
+prompt_yn()
+{
+  while :; do
+    echo -n "$1 [y/n]: "
+    read ANSWER
+    if [[ $ANSWER == "y" || $ANSWER == "Y" ]]; then
+      return 0
+    fi
+    if [[ $ANSWER == "n" || $ANSWER == "N" ]]; then
+      return 1
+    fi
+  done
+}
+
+./gen_ct_tokens
+./gen_optvars | sort >ct_optvars
+
+if prompt_yn "Include MultiSite Support?"; then
+  ./gen_mt_tokens
+  ./gen_optvars mt | sort >mt_optvars
+fi
+
+echo "Done"
+
+#
+# setup ends here

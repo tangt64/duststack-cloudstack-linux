@@ -1,0 +1,9 @@
+#!/bin/bash
+# gen_ct_tokens (07/21/2002 rss)
+
+CT=/usr/atria/bin/cleartool
+ct_token_list=$(echo 'help' | $CT | grep 'Usage:' | awk '{ print $2 }' | sort)
+echo $ct_token_list >ct_tokens
+
+#
+# gen_ct_tokens ends here
